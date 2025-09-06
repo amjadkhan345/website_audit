@@ -12,6 +12,12 @@ setup(
     install_requires=['scrapy>=2.0','requests>=2.28','beautifulsoup4>=4.12'],
     python_requires='>=3.8',
     license='MIT',
+    entry_points={
+    'console_scripts': [
+        'website-audit=website_audit.cli:main',
+    ],
+},
+
     classifiers=[
         'Development Status :: 4 - Beta',
         'Programming Language :: Python :: 3',
