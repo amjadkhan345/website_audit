@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 setup(
     name='website-audit',
-    version='0.1.1',
+    version='0.1.2',
     author='softnittech',
     author_email='info@softnit.net',
     description='Full website audit tool (broken links, SEO, PageSpeed)',
