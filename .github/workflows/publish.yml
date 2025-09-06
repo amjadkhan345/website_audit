@@ -30,6 +30,9 @@ jobs:
     # 4️⃣ Build package
     - name: Build package
       run: python setup.py sdist bdist_wheel
+    - name: Clean old builds
+      run: rm -rf build/ dist/ *.egg-info
+
 
     # 5️⃣ Publish to Test PyPI
     - name: Publish to Test PyPI
