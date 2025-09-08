@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 setup(
-    name='website-audit',
-    version='0.1.2',
-    author='softnittech',
-    author_email='info@softnit.net',
+    name='webAudit',
+    version='0.1.0',
+    author='Amjad khan',
+    author_email='info@shailatech.com',
     description='Full website audit tool (broken links, SEO, PageSpeed)',
     long_description=open('README.md', encoding='utf-8').read(),
     long_description_content_type='text/markdown',
@@ -13,9 +13,9 @@ setup(
     python_requires='>=3.8',
     license='MIT',
     entry_points={
-    'console_scripts': [
-        'website-audit=website_audit.cli:main',
-    ],
+    "console_scripts": [
+        "webAudit = webAudit.cli:run_cli",
+    ]
 },
 
     classifiers=[

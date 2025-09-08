@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 def analyze_seo(url):
     try:
         r = requests.get(url, timeout=5)
-        soup = BeautifulSoup(r.text, 'html.parser')
+        soup = BeautifulSoup(r.text, 'lxml')
     except:
         return {}
     seo_report = {

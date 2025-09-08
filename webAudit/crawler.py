@@ -6,9 +6,9 @@ class AuditSpider(scrapy.Spider):
     name = "audit_spider"
     custom_settings = {'LOG_LEVEL': 'ERROR'}
 
-    def __init__(self, start_url, max_pages=50, *args, **kwargs):
+    def __init__(self, url, max_pages=50, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.start_urls = [start_url]
+        self.start_urls = [url]
         self.visited = set()
         self.max_pages = max_pages
         self.pages = []
