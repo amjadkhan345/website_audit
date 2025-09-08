@@ -24,8 +24,8 @@ pip install webAudit
 
 ### Or from source
 ```bash
-git clone https://github.com/yourusername/webAudit.git
-cd webAudit
+git clone https://github.com/amjadkhan345/Website_audit
+cd Website_audit
 pip install .
 ```
 
@@ -48,9 +48,9 @@ webAudit audit https://example.com --max-pages 20 --sitemap
 
 ### 2️⃣ Extract Page Content
 ```bash
-webAudit extract https://example.com/page --mode smart
+webAudit extract https://example.com/page 
 ```
-- `--mode smart` → Extraction mode (currently only “smart”)  
+
 
 **Output:** Clean extracted text.
 
@@ -75,10 +75,9 @@ webAudit seo https://example.com
 
 ### 4️⃣ Crawl a Website
 ```bash
-webAudit crawl https://example.com --max-pages 30 --check-links
+webAudit crawl https://example.com 
 ```
-- `--max-pages` → Maximum pages to crawl  
-- `--check-links` → Check HTTP status of discovered URLs  
+
 
 **Output:** List of discovered URLs with optional HTTP status.
 
@@ -102,14 +101,7 @@ webAudit pagespeed https://example.com YOUR_API_KEY --strategy mobile
 
 ---
 
-### 6️⃣ Test-All Command
-```bash
-webAudit test-all https://example.com --max-pages 10 --api-key YOUR_GOOGLE_API_KEY
-```
-- Runs **audit, extract, SEO, crawl, and PageSpeed** sequentially  
-- Quick way to test everything on a single website  
 
----
 
 ## Class & Function-Based Usage
 
