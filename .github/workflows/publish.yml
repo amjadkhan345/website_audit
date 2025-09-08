@@ -1,4 +1,4 @@
-name: Publish Python Package to Test PyPI
+name: Publish Python Package to PyPI
 
 # Trigger workflow only when pushing tags like v0.1.0
 on:
