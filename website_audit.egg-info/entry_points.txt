@@ -1,2 +1,0 @@
-[console_scripts]
-website-audit = website_audit.cli:run_cli
