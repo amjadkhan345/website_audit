@@ -65,8 +65,8 @@ def parse_args():
 async def run_google(args):
     browser = SoftBrowser()
     try:
-        google_scraper = GoogleSearchScraper(browser)
-        results = await google_scraper.search(args.query, args.num_results)
+        scraper = GoogleSearchScraper(browser)
+        results = await scraper.search(args.query, args.num_results)
         print(results)
         """for r in results:
           if r["status"] == "success":
@@ -83,10 +83,13 @@ async def run_google(args):
 async def run_scrape(args):
     browser = SoftBrowser()
     try:
-        browser = SoftBrowser(headless=True)
-        page_result = await browser.go("https://example.com")
-        print(page_result)await browser.launch()
-    
+        scraper = PageScraper(browser)
+        content = await scraper.scrape(args.url, args.selector)
+        if isinstance(content, list):
+            for c in content:
+                print(c)
+        else:
+            print(content)
     finally:
         await browser.close()
 

@@ -9,7 +9,7 @@ from .auditor import WebsiteAuditor
 from .extractor import ContentExtractor
 from .crawler import AuditSpider, check_links
 from .seo import analyze_seo
-from .pagespeed import PageSpeed
+from .pagespeed import pagespeed_audit
 
 # New imports for SoftBrowser
 from .softbrowser import SoftBrowser
@@ -65,14 +65,10 @@ def parse_args():
 async def run_google(args):
     browser = SoftBrowser()
     try:
-        google_scraper = GoogleSearchScraper(browser)
-        results = await google_scraper.search(args.query, args.num_results)
-        print(results)
-        """for r in results:
-          if r["status"] == "success":
-              print(r["title"], r["url"])
-        else:
-            print("Error:", r["error"])"""
+        scraper = GoogleSearchScraper(browser)
+        results = await scraper.search(args.query, args.num_results)
+        for r in results:
+            print(f"{r['title']}\n{r['url']}\n{r['snippet']}\n---")
     finally:
         await browser.close()
 
@@ -83,10 +79,13 @@ async def run_google(args):
 async def run_scrape(args):
     browser = SoftBrowser()
     try:
-        browser = SoftBrowser(headless=True)
-        page_result = await browser.go("https://example.com")
-        print(page_result)await browser.launch()
-    
+        scraper = PageScraper(browser)
+        content = await scraper.scrape(args.url, args.selector)
+        if isinstance(content, list):
+            for c in content:
+                print(c)
+        else:
+            print(content)
     finally:
         await browser.close()
 
@@ -160,10 +159,8 @@ def run_crawl(args):
 
 
 async def run_pagespeed(args):
-    #loop = asyncio.get_event_loop()
-    #report = await loop.run_in_executor(None, pagespeed_audit, args.url, args.api_key, args.strategy)
-    pagespeed=PageSpeed(args.url, args.api_key, args.strategy)
-    report = pagespeed.audit()
+    loop = asyncio.get_event_loop()
+    report = await loop.run_in_executor(None, pagespeed_audit, args.url, args.api_key, args.strategy)
     print(f"PageSpeed report for {args.url}:")
     print(json.dumps(report, indent=2))
 

@@ -4,99 +4,57 @@ import csv
 import json
 from tqdm.asyncio import tqdm
 
-# Existing imports
 from .auditor import WebsiteAuditor
 from .extractor import ContentExtractor
 from .crawler import AuditSpider, check_links
 from .seo import analyze_seo
 from .pagespeed import PageSpeed
-
-# New imports for SoftBrowser
-from .softbrowser import SoftBrowser
-from .google_search_scraper import GoogleSearchScraper
-from .page_scraper import PageScraper
-
+from scrapy.crawler import CrawlerProcess
 
 # ----------------------
 # ARGUMENT PARSING
 # ----------------------
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Async Website Auditor with SEO, PageSpeed, and scraping capabilities"
+        description="Async Website Auditor with SEO and PageSpeed checks"
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    # --- Existing commands ---
+    # --- Audit ---
     audit_parser = subparsers.add_parser("audit", help="Audit a website")
     audit_parser.add_argument("url", help="Target website URL")
     audit_parser.add_argument("--sitemap", action="store_true", help="Use sitemap for crawling")
     audit_parser.add_argument("--max-pages", type=int, default=50, help="Maximum pages to audit")
 
+    # --- Extract ---
     extract_parser = subparsers.add_parser("extract", help="Extract clean text from a page")
     extract_parser.add_argument("url", help="Page URL to extract content from")
     extract_parser.add_argument("--mode", choices=["smart"], default="smart", help="Extraction mode")
 
+    # --- SEO ---
     seo_parser = subparsers.add_parser("seo", help="Run SEO analysis for a website")
     seo_parser.add_argument("url", help="Target website URL")
 
+    # --- Crawl ---
     crawl_parser = subparsers.add_parser("crawl", help="Crawl a website and list URLs")
     crawl_parser.add_argument("url", help="Target website URL")
+    
 
+    # --- PageSpeed ---
     ps_parser = subparsers.add_parser("pagespeed", help="Run PageSpeed insights for a URL")
     ps_parser.add_argument("url", help="Target website URL")
     ps_parser.add_argument("api_key", help="Google PageSpeed API key")
     ps_parser.add_argument("--strategy", choices=["mobile", "desktop"], default="mobile", help="Pagespeed strategy")
 
-    # --- New commands ---
-    google_parser = subparsers.add_parser("google", help="Scrape Google search results")
-    google_parser.add_argument("query", help="Search query")
-    google_parser.add_argument("--num_results", type=int, default=10, help="Number of results to fetch")
-
-    scrape_parser = subparsers.add_parser("scrape", help="Scrape any page content")
-    scrape_parser.add_argument("url", help="Target page URL")
-    scrape_parser.add_argument("--selector", help="CSS selector to extract specific elements")
-
     return parser.parse_args()
 
-
 # ----------------------
-# GOOGLE SEARCH
-# ----------------------
-async def run_google(args):
-    browser = SoftBrowser()
-    try:
-        google_scraper = GoogleSearchScraper(browser)
-        results = await google_scraper.search(args.query, args.num_results)
-        print(results)
-        """for r in results:
-          if r["status"] == "success":
-              print(r["title"], r["url"])
-        else:
-            print("Error:", r["error"])"""
-    finally:
-        await browser.close()
-
-
-# ----------------------
-# PAGE SCRAPE
-# ----------------------
-async def run_scrape(args):
-    browser = SoftBrowser()
-    try:
-        browser = SoftBrowser(headless=True)
-        page_result = await browser.go("https://example.com")
-        print(page_result)await browser.launch()
-    
-    finally:
-        await browser.close()
-
-
-# ----------------------
-# Existing command runners...
+# AUDIT
 # ----------------------
 async def run_audit(args):
     auditor = WebsiteAuditor(args.url, sitemap=args.sitemap, max_pages=args.max_pages)
     print(f"Starting full website audit for {args.url} ...")
+
     visited_pages = set()
 
     async def crawl_with_progress():
@@ -107,6 +65,7 @@ async def run_audit(args):
     async def async_crawl_with_progress(auditor):
         queue = [auditor.url]
         domain = auditor.url
+
         async with auditor.aiohttp_session() as session:
             while queue and len(visited_pages) < auditor.max_pages:
                 page = queue.pop(0)
@@ -139,26 +98,35 @@ async def run_audit(args):
             writer.writerow(page)
     print(f"Report saved as {csv_file}")
 
-
+# ----------------------
+# EXTRACT
+# ----------------------
 async def run_extract(args):
     extractor = ContentExtractor(args.url)
     result = await extractor.extract()
     print(result)
 
-
+# ----------------------
+# SEO
+# ----------------------
 async def run_seo(args):
     loop = asyncio.get_event_loop()
     report = await loop.run_in_executor(None, analyze_seo, args.url)
     print(f"SEO report for {args.url}:")
     print(json.dumps(report, indent=2))
 
-
+# ----------------------
+# CRAWL
+# ----------------------
 def run_crawl(args):
     print(f"Checking links for {args.url} ...")
     results = check_links([args.url])
     print(results)
 
 
+# ----------------------
+# PAGESPEED
+# ----------------------
 async def run_pagespeed(args):
     #loop = asyncio.get_event_loop()
     #report = await loop.run_in_executor(None, pagespeed_audit, args.url, args.api_key, args.strategy)
@@ -166,7 +134,6 @@ async def run_pagespeed(args):
     report = pagespeed.audit()
     print(f"PageSpeed report for {args.url}:")
     print(json.dumps(report, indent=2))
-
 
 # ----------------------
 # RUN CLI
@@ -184,11 +151,6 @@ def run_cli():
         run_crawl(args)
     elif args.command == "pagespeed":
         asyncio.run(run_pagespeed(args))
-    elif args.command == "google":
-        asyncio.run(run_google(args))
-    elif args.command == "scrape":
-        asyncio.run(run_scrape(args))
-
 
 if __name__ == "__main__":
     run_cli()
