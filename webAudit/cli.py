@@ -84,8 +84,9 @@ async def run_scrape(args):
     browser = SoftBrowser()
     try:
         browser = SoftBrowser(headless=True)
-        page_result = await browser.go("https://example.com")
-        print(page_result)await browser.launch()
+        await browser.launch()
+        page_result = await browser.go(args.url)
+        print(page_result)
     
     finally:
         await browser.close()
